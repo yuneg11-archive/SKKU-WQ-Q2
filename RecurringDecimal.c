@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_FLOAT_LEN 48
-#define MAX_REC_LEN 9
-#define MAX_RES_LEN 64
+#define MAX_FLOAT_LEN 120
+#define MAX_RESULT_LEN 128
 
 #define IO_CONSOLE 1
 #define IO_FILE    2
@@ -13,16 +12,16 @@
 #define TYPE_INFINITE 2
 
 int calculate_division(int numerator, int denominator, char *result) {
-    int nth_numerator[MAX_FLOAT_LEN] = {};
-    int i;
+    int nth_numerator[MAX_FLOAT_LEN];
+    int i, j, k;
 
     if (numerator >= denominator || numerator * 10 < denominator) {
         if (numerator == denominator) {
             result[0] = '1';
-            result[1] = '\n';
+            result[1] = '\0';
             return TYPE_FINITE;
         } else {
-            result[0] = '\n';
+            result[0] = '\0';
             return TYPE_ERROR;
         }
     } else {
@@ -32,15 +31,26 @@ int calculate_division(int numerator, int denominator, char *result) {
 
     for (i = 0; i < MAX_FLOAT_LEN; i++) {
         nth_numerator[i] = numerator;
-        result[i+2] = ((numerator * 10) / denominator) + '0';
-        numerator = (numerator * 10) % denominator;
-
+        
         if (numerator == 0) {
-            result[i+3] = '\0';
+            result[i + 2] = '\0';
             return TYPE_FINITE;
         } else {
-            // Check recurring
+            for (j = 0; j < i; j++) {
+                if (nth_numerator[j] == numerator) {
+                    for (k = i; k > j; k--) {
+                        result[k + 2] = result[k + 1];
+                    }
+                    result[j + 2] = '[';
+                    result[i + 3] = ']';
+                    result[i + 4] = '\0';
+                    return TYPE_INFINITE;
+                }
+            }
         }
+
+        result[i + 2] = ((numerator * 10) / denominator) + '0';
+        numerator = (numerator * 10) % denominator;
     }
 
     result[i+2] = '\0';
@@ -69,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         int numerator, denominator;
-        char result[MAX_RES_LEN];
+        char result[MAX_RESULT_LEN];
         int type;
 
         if (mode == IO_CONSOLE) {
@@ -109,7 +119,7 @@ int main(int argc, char *argv[]) {
             if (type == TYPE_FINITE || type == TYPE_INFINITE) {
                 fprintf(fout, "%d / %d = %s (%s)\n", numerator, denominator, result, type == TYPE_FINITE ? "Finite" : "Infinite");
             } else {
-                fprintf(fout, "Out of Range (\"Numerator / Denominator\" is not from 0.1 to 1)\n");
+                fprintf(fout, "%d / %d = Out of Range (\"Numerator / Denominator\" is not from 0.1 to 1)\n", numerator, denominator);
             }
         }
     }

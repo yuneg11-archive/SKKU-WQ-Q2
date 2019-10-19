@@ -4,7 +4,7 @@ FLAGS= -O3 -g -Wno-unused-result
 all: RecurringDecimal
 
 RecurringDecimal: RecurringDecimal.c
-	$(CC) $(FLAGS) RecurringDecimal.c -o RecurringDecimal
+	$(CC) RecurringDecimal.c -o RecurringDecimal $(FLAGS)
 
 clean:
 	rm -f RecurringDecimal

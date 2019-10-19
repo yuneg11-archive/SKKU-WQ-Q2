@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#define MAX_FLOAT_LEN 48
 #define MAX_REC_LEN 9
 #define MAX_RES_LEN 64
 
@@ -10,6 +11,41 @@
 #define TYPE_ERROR    0
 #define TYPE_FINITE   1
 #define TYPE_INFINITE 2
+
+int calculate_division(int numerator, int denominator, char *result) {
+    int nth_numerator[MAX_FLOAT_LEN] = {};
+    int i;
+
+    if (numerator >= denominator || numerator * 10 < denominator) {
+        if (numerator == denominator) {
+            result[0] = '1';
+            result[1] = '\n';
+            return TYPE_FINITE;
+        } else {
+            result[0] = '\n';
+            return TYPE_ERROR;
+        }
+    } else {
+        result[0] = '0';
+        result[1] = '.';
+    }
+
+    for (i = 0; i < MAX_FLOAT_LEN; i++) {
+        nth_numerator[i] = numerator;
+        result[i+2] = ((numerator * 10) / denominator) + '0';
+        numerator = (numerator * 10) % denominator;
+
+        if (numerator == 0) {
+            result[i+3] = '\0';
+            return TYPE_FINITE;
+        } else {
+            // Check recurring
+        }
+    }
+
+    result[i+2] = '\0';
+    return TYPE_INFINITE;
+}
 
 int main(int argc, char *argv[]) {
     FILE *fin, *fout;
@@ -34,7 +70,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         int numerator, denominator;
         char result[MAX_RES_LEN];
-        short type;
+        int type;
 
         if (mode == IO_CONSOLE) {
             printf("\n");
@@ -61,10 +97,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        /* DEBUG */
-        type = TYPE_FINITE;
-        strcpy(result, "RESULT");
-        /* DEBUG */
+        type = calculate_division(numerator, denominator, result);
 
         if (mode == IO_CONSOLE) {
             if (type == TYPE_FINITE || type == TYPE_INFINITE) {

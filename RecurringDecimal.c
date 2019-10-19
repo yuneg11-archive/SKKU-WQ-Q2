@@ -13,7 +13,6 @@
 
 int calculate_division(int numerator, int denominator, char *result) {
     int nth_numerator[MAX_FLOAT_LEN];
-    int i, j, k;
 
     if (numerator >= denominator || numerator * 10 < denominator) {
         if (numerator == denominator) {
@@ -29,16 +28,14 @@ int calculate_division(int numerator, int denominator, char *result) {
         result[1] = '.';
     }
 
-    for (i = 0; i < MAX_FLOAT_LEN; i++) {
-        nth_numerator[i] = numerator;
-        
+    for (int i = 0; i < MAX_FLOAT_LEN; i++) {
         if (numerator == 0) {
             result[i + 2] = '\0';
             return TYPE_FINITE;
         } else {
-            for (j = 0; j < i; j++) {
+            for (int j = 0; j < i; j++) {
                 if (nth_numerator[j] == numerator) {
-                    for (k = i; k > j; k--) {
+                    for (int k = i; k > j; k--) {
                         result[k + 2] = result[k + 1];
                     }
                     result[j + 2] = '[';
@@ -49,11 +46,12 @@ int calculate_division(int numerator, int denominator, char *result) {
             }
         }
 
+        nth_numerator[i] = numerator;
         result[i + 2] = ((numerator * 10) / denominator) + '0';
         numerator = (numerator * 10) % denominator;
     }
 
-    result[i+2] = '\0';
+    result[MAX_FLOAT_LEN + 2] = '\0';
     return TYPE_INFINITE;
 }
 
@@ -88,22 +86,21 @@ int main(int argc, char *argv[]) {
             printf("Input Numerator Number: ");
             if (scanf("%d", &numerator) == EOF) {
                 printf("\n");
-                return 0;
+                break;
             }
 
             printf("Input Denominator Number: ");
             if (scanf("%d", &denominator) == EOF) {
                 printf("\n");
-                return 0;
+                break;
             }
         } else {
             int readn = fscanf(fin, "%d / %d", &numerator, &denominator);
             if (readn == EOF) {
-                return 0;
+                break;
             } else if (readn != 2) {
                 printf("Input file contains wrong format");
-                fclose(fout);
-                return -1;
+                break;
             }
         }
 
